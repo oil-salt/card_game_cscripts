@@ -3,7 +3,48 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MainClasses : MonoBehaviour {
+    public class Global_abilities
+    {
 
+    }
+    public class buff
+    {
+        private string name;
+        private string describe;
+        private string belongsto;
+        private Global_abilities Abilities;
+        public buff()
+        {
+            //do nothing
+        }
+        public buff setName(string s)
+        {
+            name = s;
+            return this;
+        }
+        public buff setDescribe(string s)
+        {
+            describe = s;
+            return this;
+        }
+        public buff setBelongsTo(character c)
+        {
+            belongsto=c;
+            return this;
+        }
+        public buff setGlobalAbilities(Global_abilities g)
+        {
+            Abilities=g;
+            return this;
+        }
+        //
+        public void takeEffect()
+        {
+            Type type=typeof(MainClasses.Global_abilities);
+            object[] para=new object[]{belongsto};
+            type.GetMethod(name).Invoke(Abilities,para);
+        }
+    }
     public class character
     {
         private string name;
@@ -13,7 +54,7 @@ public class MainClasses : MonoBehaviour {
         public character()
         {
             //初始化
-        
+            //do nothing
         }
         public character setName(string s)
         {
