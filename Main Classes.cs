@@ -1,82 +1,114 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;   //反射
 
 public class MainClasses : MonoBehaviour {
     public class Global_abilities
     {
-
+        private Hashtable name2describe = new Hashtable();
+        public void addDescribe(string name,string describe)
+        {
+            name2describe.Add(name, describe);
+        }
+        public string return_Describe_of_Ability(string name)
+        {
+            string ans="";
+            return ans;
+        }
     }
-    public class buff
+    public class Buff
     {
         private string name;
         private string describe;
-        private string belongsto;
-        private Global_abilities Abilities;
-        public buff()
+        private Character belongsto;
+        private Global_abilities abilities;
+        public Buff()
         {
             //do nothing
         }
-        public buff setName(string s)
+        public Buff setName(string s)
         {
             name = s;
             return this;
         }
-        public buff setDescribe(string s)
+        public Buff setDescribe(string s)
         {
             describe = s;
             return this;
         }
-        public buff setBelongsTo(character c)
+        public Buff setBelongsTo(Character c)
         {
             belongsto=c;
             return this;
         }
-        public buff setGlobalAbilities(Global_abilities g)
+        public Buff setGlobalAbilities(Global_abilities g)
         {
-            Abilities=g;
+            abilities=g;
+            return this;
+        }
+        public Buff init()
+        {
+            //为在Global中能以名字查到Describe
+            abilities.addDescribe(name,describe);
             return this;
         }
         //
         public void takeEffect()
         {
             Type type=typeof(MainClasses.Global_abilities);
-            object[] para=new object[]{belongsto};
-            type.GetMethod(name).Invoke(Abilities,para);
+            object[] para=new object[]{belongsto};  //buff类型的参数，只有buff所属角色一个
+            type.GetMethod(name).Invoke(abilities,para);
         }
     }
-    public class character
+    public class Character
     {
         private string name;
         private string describe;
         private int hp_ori, hp_cur_max, hp_cur;
         private int speed_ori, speed_cur;
-        public character()
-        {
+        List<Buff> buffs = new List<Buff>();
+        private Global_abilities abilities;
+
+        public Character()
+        {    
             //初始化
             //do nothing
         }
-        public character setName(string s)
+        public Character setName(string s)
         {
             name = s;
             return this;
         }
-        public character setDescribe(string s)
+        public Character setDescribe(string s)
         {
             describe = s;
             return this;
         }
-        public character setOriginHp(int i)
+        public Character setOriginHp(int i)
         {
             hp_ori = i;
             return this;
         }
-        public character setOriginSpeed(int i)
+        public Character setOriginSpeed(int i)
         {
             speed_ori = i;
             return this;
         }
-        public character Creat()
+        public Character addNewBuff(string s)
+        {
+            Buff new_buff = new Buff();
+            new_buff.setName(s).setDescribe(abilities.return_Describe_of_Ability(s))
+                .setBelongsTo(this).setGlobalAbilities(abilities);
+            buffs.Add(new_buff);
+            return this;
+        }
+        public Character setGlobalAbilities(Global_abilities g)
+        {
+            abilities = g;
+            return this;
+        }
+        public Character creat()
         {
             //扫描牌组组，并初始化数值
             hp_cur_max = hp_ori;
@@ -94,8 +126,6 @@ public class MainClasses : MonoBehaviour {
             //Debug.Log("hey");
             return ans;
         }
-        
-
     }
 
 }
