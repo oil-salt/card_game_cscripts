@@ -13,7 +13,7 @@ public class MainClasses : MonoBehaviour {
         }
         public string return_Describe_of_Ability(string name)
         {
-            string ans="";
+            string ans=(string)name2describe[name];
             return ans;
         }
     }
