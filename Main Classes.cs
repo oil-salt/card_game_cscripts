@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;   //反射
+using System.IO;    //读写
+using System.Text;
 
 public class MainClasses : MonoBehaviour {
     public class Global_abilities
@@ -16,6 +18,19 @@ public class MainClasses : MonoBehaviour {
             string ans=(string)name2describe[name];
             return ans;
         }
+        public Skill creatSkillfromConfig(string name_Skill,Character c)
+        {
+            string jsontext = File.ReadAllText("/Unity Projects/Boardgame-type17/Assets/Data/Skill/" + name_Skill + ".json", Encoding.UTF8);           
+            Skill skill_json = JsonUtility.FromJson<Skill>(jsontext);
+            skill_json.setGlobalAbilities(this).setSkillCaster(c);            
+            return skill_json;
+        }
+        //-------------------------单体技能-------------------------------------
+        //----------------------------------------------------------------------
+        //-------------------------AOE技能--------------------------------------
+        //----------------------------------------------------------------------
+        //-------------------------状态Buff-------------------------------------
+        //----------------------------------------------------------------------
     }
     public class Buff
     {
@@ -23,6 +38,7 @@ public class MainClasses : MonoBehaviour {
         private string describe;
         private Character belongsto;
         private Global_abilities abilities;
+        private string return_Message;
         public Buff()
         {
             //do nothing
@@ -54,11 +70,103 @@ public class MainClasses : MonoBehaviour {
             return this;
         }
         //
-        public void takeEffect()
+        public string takeEffect()
         {
+            return_Message="";
             Type type=typeof(MainClasses.Global_abilities);
             object[] para=new object[]{belongsto};  //buff类型的参数，只有buff所属角色一个
-            type.GetMethod(name).Invoke(abilities,para);
+            try
+            {
+                type.GetMethod(name).Invoke(abilities,para);
+            }
+            catch
+            {
+                return_Message="No such Buff";
+            }
+            return return_Message;
+        }
+    }
+    public class Skill
+    {
+        public string name;
+        public string describe;
+        private Character caster;
+        private Global_abilities abilities;
+        public string skill_Type;  //AOE, or Single
+        private string return_Message;
+        public Skill()
+        {
+            //do nothing
+        }
+        public Skill setName(string s)
+        {
+            name = s;
+            return this;
+        }
+        public Skill setDescribe(string s)
+        {
+            describe = s;
+            return this;
+        }
+        public Skill setSkillCaster(Character c)
+        {
+            caster=c;
+            return this;
+        }
+        public Skill setGlobalAbilities(Global_abilities g)
+        {
+            abilities=g;
+            return this;
+        }
+        public Skill setSkillType(string s)
+        {
+            skill_Type=s;
+            return this;
+        }
+        public Skill init()
+        {
+            //为在Global中能以名字查到Describe
+            abilities.addDescribe(name,describe);
+            return this;
+        }
+        //
+        public string skill_Single(Character target)
+        {
+            return_Message="";
+            Type type=typeof(MainClasses.Global_abilities);
+            object[] para=new object[]{caster,target,this};  //单体技能类型的参数，只有施法者和目标，以及自身用来接收返回
+            try
+            {
+                type.GetMethod(name).Invoke(abilities,para);
+            }
+            catch
+            {
+                return_Message="No such Skill";
+            }
+            return return_Message;
+        }
+        public string skill_AOE(Character[] multi_target)
+        {
+            return_Message="";
+            Type type=typeof(MainClasses.Global_abilities);
+            object[] para=new object[]{caster,multi_target,this};    //AOE技能的参数，包含了施法者，目标数组，以及自身用来接收返回
+            try
+            {
+                type.GetMethod(name).Invoke(abilities,para);
+            }
+            catch
+            {
+                return_Message="No such Skill";
+            }
+            return return_Message;
+        }
+        public string info()
+        {
+            string ans = "";
+            ans = "名称：" + name + "\n"
+                + "描述：" + describe + "\n"
+                + "类型：" + skill_Type + "\n";
+            return ans;
         }
     }
     public class Character
@@ -95,10 +203,10 @@ public class MainClasses : MonoBehaviour {
             speed_ori = i;
             return this;
         }
-        public Character addNewBuff(string s)
+        public Character addNewBuff(string buffName)
         {
             Buff new_buff = new Buff();
-            new_buff.setName(s).setDescribe(abilities.return_Describe_of_Ability(s))
+            new_buff.setName(buffName).setDescribe(abilities.return_Describe_of_Ability(buffName))
                 .setBelongsTo(this).setGlobalAbilities(abilities);
             buffs.Add(new_buff);
             return this;

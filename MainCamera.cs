@@ -2,23 +2,64 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;   //反射
+using System.IO;    //读写
+using System.Text;  
 
-public class MainCamera : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-        MainClasses.character myself = new MainClasses.character();
+//---------------多继承---------------------
+public interface iDied
+{
+        
+}
+public static class ExtendDied
+{
+    public static void tryDie<T>(this T example) where T : iDied
+    {
+        Debug.Log("屎啊");
+    }
+}
+//-----------------------------------------
+
+public class MainCamera : MonoBehaviour,iDied {
+
+    class ModelTest
+    {
+        public string name;
+        public int age;
+        public string[] interests;
+        public string morethings;
+        public string toString()
+        {
+            string s= name + "\n" + age.ToString() + "\n" + morethings + "\n";
+            foreach (string inter in interests) s = s + inter + "\n";
+            return s;
+        }
+    }
+
+    // Use this for initialization
+    void Start () {
+        MainClasses.Character myself = new MainClasses.Character();
         myself.setName("hhh").setDescribe("你们的爸爸")
             .setOriginHp(2);
         //用函数名调用函数的例子，注意到这个Invoke必须要对实例才起作用
-        Type type = typeof(MainClasses.character);
+        Type type = typeof(MainClasses.Character);
         int speed_ori = 2;
         object[] para = new object[] { speed_ori };
         type.GetMethod("setOriginSpeed").Invoke(myself, para);
         //
-        myself.Creat();
+        myself.creat();
         Debug.Log(myself.info());
-        
+        this.tryDie();
+
+        //------------Json字符串创建对象------------------      
+        //string jsontext = File.ReadAllText("/Unity Projects/Boardgame-type17/Assets/Data/Test.json", Encoding.UTF8);
+        //Debug.Log(jsontext);
+        //ModelTest obj = JsonUtility.FromJson<ModelTest>(jsontext);
+        //Debug.Log(obj.toString());
+        //-----------------------------------------------
+        MainClasses.Global_abilities g = new MainClasses.Global_abilities();
+        MainClasses.Skill skill = g.creatSkillfromConfig("火球术", myself);
+        Debug.Log(skill.info());
     }
 	
 	// Update is called once per frame
