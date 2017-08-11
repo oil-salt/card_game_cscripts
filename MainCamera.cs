@@ -6,7 +6,7 @@ using System.IO;    //读写
 using System.Text;  
 
 
-//---------------多继承---------------------
+//---------------Mix in---------------------
 public interface iDied
 {
         
@@ -60,6 +60,19 @@ public class MainCamera : MonoBehaviour,iDied {
         MainClasses.Global_abilities g = new MainClasses.Global_abilities();
         MainClasses.Skill skill = g.creatSkillfromConfig("火球术", myself);
         Debug.Log(skill.info());
+        skill.save();   //保存为json
+        //---------------------------------------------
+        List<string> ss = new List<string>();
+        ss.Add("abc");
+        ss.Add("def");
+        ss.Add("ghi");
+        for (int i = 0; i < ss.Count; i++)
+            Debug.Log(ss[i]);
+        Debug.Log("--------------");
+        ss.Remove("def");
+        for (int i = 0; i < ss.Count; i++)
+            Debug.Log(ss[i]);
+
     }
 	
 	// Update is called once per frame

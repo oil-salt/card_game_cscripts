@@ -6,8 +6,20 @@ using System.IO;    //读写
 using System.Text;
 
 public class MainClasses : MonoBehaviour {
+    private class fit_Skill
+    {
+        public string name;
+        public string describe;
+        public string skill_Type;
+    }
+    public class Cards
+    {
+        public string name;
+        public string describe;
+    }
     public class Global_abilities
     {
+        
         private Hashtable name2describe = new Hashtable();
         public void addDescribe(string name,string describe)
         {
@@ -20,11 +32,17 @@ public class MainClasses : MonoBehaviour {
         }
         public Skill creatSkillfromConfig(string name_Skill,Character c)
         {
-            string jsontext = File.ReadAllText("/Unity Projects/Boardgame-type17/Assets/Data/Skill/" + name_Skill + ".json", Encoding.UTF8);           
-            Skill skill_json = JsonUtility.FromJson<Skill>(jsontext);
-            skill_json.setGlobalAbilities(this).setSkillCaster(c);            
-            return skill_json;
+            string jsontext = File.ReadAllText(Application.dataPath + "/Data/Skill/" + name_Skill + ".json", Encoding.UTF8);           
+            fit_Skill skill_json = JsonUtility.FromJson<fit_Skill>(jsontext);
+            Skill ans = new Skill();
+            ans.setName(skill_json.name)
+                .setDescribe(skill_json.describe)
+                .setSkillType(skill_json.skill_Type)
+                .setGlobalAbilities(this).setSkillCaster(c);            
+            return ans;
         }
+        //-----------------------各种检定---------------------------------------
+        //----------------------------------------------------------------------
         //-------------------------单体技能-------------------------------------
         //----------------------------------------------------------------------
         //-------------------------AOE技能--------------------------------------
@@ -88,11 +106,12 @@ public class MainClasses : MonoBehaviour {
     }
     public class Skill
     {
-        public string name;
-        public string describe;
+        private string name;
+        private string describe;
         private Character caster;
         private Global_abilities abilities;
-        public string skill_Type;  //AOE, or Single
+        private string skill_Type;  //AOE, or Single
+        private List<string> require_Cost;
         private string return_Message;
         public Skill()
         {
@@ -121,6 +140,11 @@ public class MainClasses : MonoBehaviour {
         public Skill setSkillType(string s)
         {
             skill_Type=s;
+            return this;
+        }
+        public Skill setRequireCost(List<string> ss)
+        {
+            require_Cost = ss;
             return this;
         }
         public Skill init()
@@ -167,6 +191,16 @@ public class MainClasses : MonoBehaviour {
                 + "描述：" + describe + "\n"
                 + "类型：" + skill_Type + "\n";
             return ans;
+        }
+        public void save()
+        {
+            fit_Skill jSkill = new fit_Skill();
+            jSkill.name = name;
+            jSkill.describe = describe;
+            jSkill.skill_Type = skill_Type;
+            string jString = JsonUtility.ToJson(jSkill, true);
+            string path = Path.Combine(Application.dataPath + "/Data/Skill/", name + ".json");
+            File.WriteAllText(path, jString);
         }
     }
     public class Character
