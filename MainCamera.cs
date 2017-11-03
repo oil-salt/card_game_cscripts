@@ -65,6 +65,7 @@ public class MainCamera : MonoBehaviour,iDied {
         List<string> ss = new List<string>();
         ss.Add("abc");
         ss.Add("def");
+        ss.Add("def");
         ss.Add("ghi");
         for (int i = 0; i < ss.Count; i++)
             Debug.Log(ss[i]);
@@ -72,6 +73,16 @@ public class MainCamera : MonoBehaviour,iDied {
         ss.Remove("def");
         for (int i = 0; i < ss.Count; i++)
             Debug.Log(ss[i]);
+        ss.Remove("nothing");
+        Debug.Log("--------------");
+        List<string> re_ss = ss;
+        while (re_ss.Count > 0)
+            ss.Remove(re_ss[0]);
+        Debug.Log(ss.Count);
+        Debug.Log("--------------");
+        System.Random ra = new System.Random();
+        int roll = ra.Next(11) + 2;
+        Debug.Log(roll);
 
     }
 	
